@@ -1,0 +1,11 @@
+function App() {
+  const [count, setCount] = useState(0)
+
+  return (
+    <>
+     <p className='text-5xl text-red-500 bg-blue-500'> Hello From App.jsx </p>
+    </>
+  )
+}
+
+export default App
