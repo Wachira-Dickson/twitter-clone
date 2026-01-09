@@ -9,20 +9,52 @@ import ProfilePage from './pages/profile/ProfilePage.jsx'
 import Sidebar from './components/common/Sidebar.jsx'
 import RightPanel from './components/common/RightPanel.jsx'
 
+import { Toaster } from 'react-hot-toast'
+import { useQuery } from '@tanstack/react-query'
+
 function App() {
+  const { data:authUser,isLoading } = useQuery({
+    queryKey: ['authUser'],
+    queryFn: async() => {
+      try{
+        const res = await fetch("/api/auth/me");
+        const data = await res.json();
+        if(data.error) return null;
+        if(!res.ok || !data.success) {
+          throw new Error(data.error || "Something went wrong");
+        }
+        console.log("Authenticated user:", data);
+        return data;
+
+      }catch(error) {
+        throw new Error(error.message);
+      }
+    },
+    retry: false,
+  });
+
+  if(isLoading) {
+    return (
+      <div className='h-screen flex justify-center items-center'>
+        <LoadingSpinner size='lg'/>
+      </div>
+    )
+  }
+
   return (
     <div className='flex max-w-6xl mx-auto'>
-      <Sidebar />
+      {authUser && <Sidebar />}
 
       <Routes>
-        <Route path='/' element={<Homepage />} />
-        <Route path='/login' element={<Login />} />
-        <Route path='/register' element={<Register />} />
-        <Route path= '/signUp' element = {<SignUp />} />
-        <Route path='/notifications' element={<NotificationPage />} />
-        <Route path='/profile/:username' element={<ProfilePage />} />
+        <Route path='/' element={authUser ? <Homepage /> : <Navigate to='/login' /> } />
+        <Route path='/login' element={!authUser ? <Login /> : <Navigate to='/' /> } />
+        <Route path='/signUp' element={!authUser ? <Register /> : <Navigate to='/' /> } />
+        <Route path= '/register' element = {<SignUp />} />
+        <Route path='/notifications' element={authUser ? <NotificationPage /> : <Navigate to='/login' /> } />
+        <Route path='/profile/:username' element={authUser ? <ProfilePage /> : <Navigate to='/login' /> } />
       </Routes>
-      <RightPanel />
+      {authUser && <RightPanel />}
+      <Toaster />
     </div>
   )
 }
