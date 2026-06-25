@@ -103,7 +103,7 @@ twitter-clone/
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/your-username/twitter-clone.git
+git clone https://github.com/Wachira-Dickson/twitter-clone.git
 cd twitter-clone
 ```
 
